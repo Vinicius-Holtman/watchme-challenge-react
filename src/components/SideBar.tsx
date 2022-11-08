@@ -1,22 +1,30 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, memo, SetStateAction, useCallback, useEffect, useState } from "react";
 import { api } from "../services/api";
 import { GenreResponseProps } from "../types/GenreResponse";
 import { Button } from "./Button";
+import 'regenerator-runtime/runtime'
 
 import '../styles/sidebar.scss';
 
-interface SideBarProps {
+interface SideBarComponentProps {
   selectedGenreId: number;
   setSelectedGenreId: Dispatch<SetStateAction<number>>;
 }
 
-export function SideBar({ selectedGenreId, setSelectedGenreId }: SideBarProps) {
+export function SideBarComponent({ selectedGenreId, setSelectedGenreId }: SideBarComponentProps) {
   const [genres, setGenres] = useState<GenreResponseProps[]>([]);
 
+  const fetchGenres = useCallback(
+    async () => {
+      await api.get<GenreResponseProps[]>('genres').then(response => {
+        setGenres(response.data);
+      });
+    },
+    []
+  )
+
   useEffect(() => {
-    api.get<GenreResponseProps[]>('genres').then(response => {
-      setGenres(response.data);
-    });
+    fetchGenres()
   }, []);
 
   function handleClickButton(id: number) {
@@ -41,3 +49,5 @@ export function SideBar({ selectedGenreId, setSelectedGenreId }: SideBarProps) {
     </nav>
   );
 }
+
+export const SideBar = memo(SideBarComponent)
