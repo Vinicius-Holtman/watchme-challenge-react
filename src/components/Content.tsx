@@ -2,14 +2,15 @@ import { GenreResponseProps } from '../types/GenreResponse';
 import { MovieProps } from '../types/Movie';
 import { MovieCard } from './MovieCard';
 
+import { memo } from 'react';
 import '../styles/content.scss';
 
-interface ContentProps {
+interface ContentComponentProps {
   movies: MovieProps[];
   selectedGenre: GenreResponseProps
 }
 
-export function Content({ movies, selectedGenre }: ContentProps) {
+function ContentComponent({ movies, selectedGenre }: ContentComponentProps) {
   return (
     <div className="container">
       <header>
@@ -26,3 +27,7 @@ export function Content({ movies, selectedGenre }: ContentProps) {
     </div>
   );
 }
+
+export const Content = memo(ContentComponent)
+
+

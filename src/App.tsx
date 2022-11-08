@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import 'regenerator-runtime/runtime'
 
 import './styles/global.scss';
 
@@ -13,15 +14,28 @@ export function App() {
   const [movies, setMovies] = useState<MovieProps[]>([]);
   const [selectedGenre, setSelectedGenre] = useState<GenreResponseProps>({} as GenreResponseProps);
 
-  useEffect(() => {
-    api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
-      setMovies(response.data);
-    });
+  const fetchMovies = useCallback(
+    async () => {
+      await api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
+        setMovies(response.data);
+      });
+    },
+    [selectedGenreId]
+  )
 
-    api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
-      setSelectedGenre(response.data);
-    })
-  }, [selectedGenreId]);
+  const fetchSelectedGenre = useCallback(
+    async () => {
+      await api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
+        setSelectedGenre(response.data);
+      })
+    },
+    [selectedGenreId]
+  )
+
+  useEffect(() => {
+    fetchMovies()
+    fetchSelectedGenre()
+  }, [selectedGenreId, fetchMovies, fetchSelectedGenre]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
